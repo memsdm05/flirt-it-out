@@ -26,6 +26,9 @@
     --button-active-color: #7100008a;
     --button-extrusion-color: #c400008a;
 
+    --col-red: #F55F75;
+    --col-yellow-light: #FDE7A8;
+
 }
 
 a {
@@ -61,13 +64,22 @@ option {
 
     border: none;
     border-radius: 0.5rem;
-    padding: 0 1em;
+    padding: 0.25em 1em;
 }
 
+[contenteditable],
 input {
     width: 100%;
+    background: #fff;
+    border-radius: 0.5rem;
 
     color: var(--input-color);
+}
+
+.strong-label {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1;
 }
 
 .card {
@@ -115,6 +127,11 @@ button {
 
         border-radius: 0.5em;
     }
+
+    
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
 }
 
 button:focus,
