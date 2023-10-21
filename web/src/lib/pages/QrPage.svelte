@@ -6,7 +6,11 @@ import {gameId} from "@/store";
 <qr-page>
     <div>Scan the QR code on the board!</div>
 
-    <button on:click={() => $gameId = "abc"}>Scan</button>
+    <a href="/register/">
+        <button on:click={() => $gameId = "abc"}>
+            Scan
+        </button>
+    </a>
 </qr-page>
 
 <style lang="scss">

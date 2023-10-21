@@ -13,9 +13,9 @@ let name = "";
             placeholder="your name"
             id="name-input" />
 
-    <div>
+    <a href="/">
         <button on:click={() => $username = name}>Next</button>
-    </div>
+    </a>
 </name-page>
 
 <style lang="scss">
