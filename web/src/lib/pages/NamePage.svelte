@@ -1,10 +1,18 @@
 <script lang="ts">
+import { goto } from "$app/navigation";
 import {username} from "@/store";
 
 let name = "";
+
+const onSubmitName = () => {
+    if (name.length === 0) return;
+
+    $username = name;
+    goto("/");
+};
 </script>
 
-<name-page>
+<div>
     <label class="strong-label"
             for="name-input">My name is</label>
     
@@ -13,13 +21,14 @@ let name = "";
             placeholder="your name"
             id="name-input" />
 
-    <a href="/">
-        <button on:click={() => $username = name}>Next</button>
-    </a>
-</name-page>
+    <div>
+        <button on:click={onSubmitName}
+                disabled={name.length === 0}>Next</button>
+    </div>
+</div>
 
 <style lang="scss">
-name-page {
+div {
     display: flex;
     flex-flow: column;
     align-items: flex-start;

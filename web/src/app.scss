@@ -27,6 +27,7 @@
     --button-extrusion-color: #c400008a;
 
     --col-red: #F55F75;
+    --col-yellow: #FFD584;
     --col-yellow-light: #FDE7A8;
 
 }
@@ -48,25 +49,7 @@ body {
     height: 100vh;
 
     font-size: 1.5rem;
-}
-
-
-main {
-    width: 100%;
-    height: 100vh;
-
-    display: flex;
-    flex-flow: column;
-    align-items: center;
-
-    text-align: center;
-
-    > :not(h1) {
-        width: 100%;
-        flex-grow: 1;
-        flex-shrink: 1;
-        padding: 2rem;
-    }
+    overflow: hidden;
 }
 
 h1 {

@@ -1,3 +1,3 @@
-<lobby-page>
+<div>
     <div>The game will start shortly…</div>
-</lobby-page>
+</div>
