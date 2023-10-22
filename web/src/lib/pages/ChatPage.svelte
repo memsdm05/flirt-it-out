@@ -33,7 +33,6 @@ const send = async () => {
     messages = messages;
 
     messageSubmitted = true;
-    newMessageText = "";
 
     input?.blur();
 
@@ -41,6 +40,8 @@ const send = async () => {
     $socket!.send(JSON.stringify({
         content: newMessageText,
     }));
+    
+    newMessageText = "";
     
 
     awaitingResponse = true;
