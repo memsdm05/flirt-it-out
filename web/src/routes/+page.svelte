@@ -9,7 +9,7 @@ import {GameState, gameState, socket} from "@/store";
 
 
 onMount(() => {
-    const socketUrl = new URL("/echo", location.href);
+    const socketUrl = new URL("/client", location.href);
     socketUrl.protocol = socketUrl.protocol.replace("http", "ws");
     $socket = new WebSocket(socketUrl.href);
     $socket.addEventListener("open", () => {
