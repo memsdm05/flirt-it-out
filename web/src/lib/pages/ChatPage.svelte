@@ -5,6 +5,7 @@ import { cubicOut } from "svelte/easing";
 import MessageBubble from "$/MessageBubble.svelte";
 
 import timerStar from "$/images/timer-star.svg";
+    import { socket, type SocketMessage } from "@/store";
 
 interface Message {
     fromPlayer: boolean;
@@ -32,11 +33,18 @@ const send = async () => {
     messages = messages;
 
     messageSubmitted = true;
-    newMessageText = "";
 
     input?.blur();
 
-    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    $socket!.send(JSON.stringify({
+        action: "msg",
+        payload: {
+            content: newMessageText,
+        }
+    }));
+
+    newMessageText = "";
     
 
     awaitingResponse = true;
@@ -44,7 +52,24 @@ const send = async () => {
     hasReceivedIndicator = true;
     const receivedTimeout = setTimeout(() => hasReceivedIndicator = false, 2000);
 
-    await new Promise(resolve => setTimeout(resolve, 10000));
+
+    const newText: string = await new Promise(resolve => {
+        const handleMessage = (event: MessageEvent) => {
+            const data: SocketMessage<"msg"> = JSON.parse(event.data);
+
+            switch (data.action) {
+                case "msg":
+                    resolve(data.payload.content);
+                    break;
+
+                default:
+                    $socket!.addEventListener("message", handleMessage, {once: true});
+                    break;
+            }
+        }
+
+        $socket!.addEventListener("message", handleMessage, {once: true});
+    });
 
     hasReceivedIndicator = false;
     clearTimeout(receivedTimeout);
@@ -52,7 +77,7 @@ const send = async () => {
 
     messages.push({
         fromPlayer: false,
-        text: "Squadalaaaaaaaaaaaah",
+        text: newText,
     });
     messages = messages;
 
@@ -73,6 +98,7 @@ const onkeydown = (event: KeyboardEvent) => {
         event.preventDefault();
     }
 };
+
 
 
 let nSecondsRemaining = 0;
@@ -163,7 +189,7 @@ top-bar {
 ai-name-tag {
     background: linear-gradient(90deg, var(--col-red), #E94580);
     padding: 0.5rem;
-    border: 0.5rem solid var(--col-yellow-light);
+    border: 0.6rem solid var(--col-yellow-light);
     width: 70%;
     font-weight: 700;
     transform: skewY(4deg) skewX(4deg);
