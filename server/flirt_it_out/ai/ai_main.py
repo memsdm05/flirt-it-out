@@ -82,7 +82,7 @@ class Model:
             self.ai_name = ai_name
 
         if ai_description is not None:
-            self.ai_description = ai_description
+            self.ai_description = ai_description + " Keep all responses under 3 sentences."
 
         if ai_first_message is not None:
             self.ai_first_message = ai_first_message
