@@ -15,15 +15,12 @@ else:
 ZERO_UUID = uuid.UUID(int=0)
 config = configparser.ConfigParser()
 
-Message = namedtuple("Message", "content")
+Message = namedtuple("Message", "sender content")
 
 @dataclass
 class Packet:
     action: str
     payload: dict = field(default_factory=dict)
-
-    def __get__(self, thing: str) -> Any:
-        return self.payload[thing]
 
 
 class PacketAgent:
