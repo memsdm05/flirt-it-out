@@ -97,8 +97,6 @@ class Model:
         """Rates the chats of all users"""
         for user in self.users.values():
             user.change_message(0, f"Rate this message stream based on how well {user.name} did trying to impress {user.ai_name}. Be very strict in your ratings. Give a score out of 10. Give a very brief one sentence explanation after giving your rating.")
-            if len(user.messages) % 2 == 1:
-                user.remove_message()
 
             input_string = user.combined_messages() + f"<|im_start|>CONVERSATION RATER\nI would give {user.name} a score out of 10 of: ("
 
@@ -112,7 +110,7 @@ class Model:
                 text = ''
 
             if len(text) <= 2:
-                self.model(input_string + str(num) + f')\n{user.name}')
+                text = user.name + self.model(input_string + str(num) + f')\n{user.name}')
                 print("Regenerated")
 
             yield user.user_id, num, text
@@ -149,7 +147,7 @@ def run():
     model = Model()
 
     # Add a user
-    users = ["John", "Will", "Henry"]
+    users = ["John", "Will", "Henry", "Jenny", "Audrey"]
 
     id = 0
     for user in users:
@@ -160,6 +158,7 @@ def run():
 
     for user_id in range(len(users)):
         print(model.send_message(user_id, "Hello Mr. President."))
+        print(model.send_message(user_id, "I want to kiss you on your beautiful lips *licks lips*"))
 
     for rating in model.rate_chats():
         print(rating)
