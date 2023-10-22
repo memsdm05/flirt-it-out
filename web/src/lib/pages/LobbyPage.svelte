@@ -5,7 +5,7 @@ import { botName, roundEnd, GameState, gameState, socket, type SocketMessage, ty
 let displayedText = "The game will start shortly…";
 
 
-const handleMessage = (event: MessageEvent) => {
+const handleSocketMessage = (event: MessageEvent) => {
     const data: SocketMessage = JSON.parse(event.data);
 
     switch (data.action) {
@@ -25,11 +25,11 @@ const handleMessage = (event: MessageEvent) => {
 }
 
 onMount(() => {
-    $socket!.addEventListener("message", handleMessage);
+    $socket!.addEventListener("message", handleSocketMessage);
 });
 
 onDestroy(() => {
-    $socket?.removeEventListener("message", handleMessage);
+    $socket?.removeEventListener("message", handleSocketMessage);
 })
 </script>
 

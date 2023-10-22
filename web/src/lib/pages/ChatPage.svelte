@@ -5,7 +5,7 @@ import { cubicOut } from "svelte/easing";
 import MessageBubble from "$/MessageBubble.svelte";
 
 import timerStar from "$/images/timer-star.svg";
-import { botName, roundEnd, socket, type SocketMessage } from "@/store";
+import { botName, GameState, gameState, roundEnd, socket, type SocketMessage } from "@/store";
 
 interface Message {
     fromPlayer: boolean;
@@ -112,6 +112,11 @@ let timerAnimationHandle = 0;
 let timerAnimating = false;
 onMount(() => {
     const onNewFrame = (now: number) => {
+        if (Date.now() > $roundEnd.getTime()) {
+            $gameState = GameState.Scoring;
+            return;
+        }
+
         nSecondsRemaining = Math.max(0, Math.floor(($roundEnd.getTime() - Date.now()) / 1000));
         timerAnimationHandle = requestAnimationFrame(onNewFrame);
     };
