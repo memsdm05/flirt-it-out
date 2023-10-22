@@ -32,7 +32,7 @@ class MoneyJSONEncoder(json.JSONEncoder):
             packet: Packet = object_
             return {
                 "action": packet.action,
-                "payload": packet.payload
+                "payload": "_" + json.dumps(packet.payload)
             }
         else:
             return super().default(object_)
