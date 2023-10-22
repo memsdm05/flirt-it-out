@@ -43,7 +43,7 @@ class User:
 
 
 class Model:
-    def __init__(self, model_path="/home/ethan/flirt-it-out/server/flirt_it_out/ai/ai_models/mistral-7b-openorca.Q4_K_M.gguf"):
+    def __init__(self, model_path="/home/ethan/flirt-it-out/server/mistral-7b-openorca.Q4_K_M.gguf"):
         self.model = self._load_model(model_path)
 
         self.ai_name = None
