@@ -105,6 +105,7 @@ class Room:
 
         if uid == ZERO_UUID:
             await self.host.disconnect()
+            self.host_connected = asyncio.get_event_loop().create_future()
             self.host = None
 
         if uid in self.users:
