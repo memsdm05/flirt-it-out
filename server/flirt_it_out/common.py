@@ -4,6 +4,7 @@ import configparser
 from typing import Any
 import asyncio
 from quart import websocket
+import uuid
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -11,10 +12,10 @@ if TYPE_CHECKING:
 else:
     Room = None
 
+ZERO_UUID = uuid.UUID(int=0)
 config = configparser.ConfigParser()
 
-Message = namedtuple("Message", "id sender content")
-
+Message = namedtuple("Message", "content")
 
 @dataclass
 class Packet:
@@ -26,10 +27,11 @@ class Packet:
 
 
 class PacketAgent:
-    def __init__(self) -> None:
+    def __init__(self, uid) -> None:
         self.outbox = asyncio.Queue()
         self.handlers = None
         self.connected = False
+        self.id = uid
 
         self.consumer = None
         self.producer = None
@@ -37,30 +39,36 @@ class PacketAgent:
     async def _consumer(self, room):
         while True:
             data = await websocket.receive_json()
-            packet = Packet(action=data["action"], payload=data["payload"])
+            if "payload" in data:
+                packet = Packet(action=data["action"], payload=data["payload"])
+            else:
+                packet = Packet(action=data["action"])
 
             if not self.handlers:
                 continue
 
             if packet.action not in self.handlers:
                 continue
+            
+            handler = self.handlers[packet.action]
 
-            await self.handlers[packet.action](room, **packet.payload)
+            await handler(room, packet)
 
     async def _producer(self, room: Room):
         try:
             while True:
                 out = await self.outbox.get()
                 await websocket.send_json(out)
-        except:
-            room.kick(self)
-            self.disconnect()
+        except asyncio.CancelledError:
+            await room.kick(self)
+            raise
+
+    async def send(self, packet):
+        await self.outbox.put(packet)
 
     async def start(self, room: Room):
-        await self.outbox.put(Packet("hello"))
-
-        self.consumer = asyncio.create_task(self._consumer(room))
-        self.producer = asyncio.create_task(self._producer(room))
+        self.consumer = asyncio.ensure_future(self._consumer(room))
+        self.producer = asyncio.ensure_future(self._producer(room))
         self.connected = True
         return await asyncio.gather(self.consumer, self.producer)
     
@@ -68,7 +76,13 @@ class PacketAgent:
         self.consumer.cancel()
         self.producer.cancel()
 
-        await self.consumer
-        await self.producer
+        # await self.consumer
+        # await self.producer
+
+        # lmao
+        try:
+            await websocket.close(1000, reason="disconnect")
+        except:
+            pass
 
         self.connected = False
