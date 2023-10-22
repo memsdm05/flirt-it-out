@@ -1,23 +1,16 @@
 from typing import Any
 import asyncio
-from enum import Enum, auto
 import uuid
 from datetime import timedelta, datetime
 
-from .common import config, ZERO_UUID, Packet, Message
+from .common import config, ZERO_UUID, Packet, Message, RoomState
 from .user import User
 from .host import Host
 
 
-class RoomState(Enum):
-    NONE = auto()
-    LOBBY = auto()
-    GAME = auto()
-    SCORES = auto()
-    LEADERBOARD = auto()
-    END = auto()
-
 class Room:
+    SCREW_HOST_I_DONT_NEED_IT = False
+
     def __init__(self, duration, rounds=0) -> None:
         self.users: dict[uuid.UUID, User] = {}
         self.host: Host | None = None
@@ -40,11 +33,15 @@ class Room:
         self.game_loop = asyncio.ensure_future(self.loop())
 
     async def loop(self):
-        await self.host_connected
+        if not self.SCREW_HOST_I_DONT_NEED_IT:
+            await self.host_connected
+        self.state = RoomState.LOBBY
         while True:
             if self.state == RoomState.LOBBY:
                 while self.state == RoomState.LOBBY:
-                    pass
+                    new_user = await self.lobby_queue.get()
+                    self.users[new_user.id] = new_user
+                await self.broadcast(Packet("start_game"))
             elif self.state == RoomState.GAME:
                 while self.state == RoomState.GAME:
                     msg: Message = await self.pending_messages.get()
@@ -63,14 +60,24 @@ class Room:
                 for user in self.users.values():
                     await user.disconnect()
 
-    async def end():
+    async def start_game(self):
+        pass
+    
+    async def end_game(self):
         pass
 
+    async def end(self):
+        self.game_loop.cancel()
+        if self.host:
+            await self.host.disconnect()
+        for user in self.users.values():
+            await user.disconnect()
+        
     async def create_user(self, name):
         user = User(name)
         await user.send(Packet("hello"))
         await user.send(Packet("stasis", {"display": "waiting for start of game"}))
-        self.users[user.id] = user
+        self.lobby_queue.put(user)
         return user
 
     async def create_host(self):
@@ -78,6 +85,7 @@ class Room:
         await host.send(Packet("hello"))
         self.host = host
         self.host_connected.set_result(True)
+        return host
 
     def find_user(self, uuid_str):
         try:
@@ -132,4 +140,4 @@ class Room:
             host=True
         )
 
-        # rating
+        # rating stuff here

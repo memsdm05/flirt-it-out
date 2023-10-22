@@ -6,6 +6,7 @@ import asyncio
 from quart import websocket
 import uuid
 from typing import TYPE_CHECKING
+from enum import Enum, auto
 
 if TYPE_CHECKING:
     from .room import Room
@@ -14,6 +15,14 @@ else:
 
 ZERO_UUID = uuid.UUID(int=0)
 config = configparser.ConfigParser()
+
+class RoomState(Enum):
+    NONE = auto()
+    LOBBY = auto()
+    GAME = auto()
+    SCORES = auto()
+    LEADERBOARD = auto()
+    END = auto()
 
 Message = namedtuple("Message", "sender content")
 
