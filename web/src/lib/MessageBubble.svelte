@@ -1,9 +1,13 @@
 <script lang="ts">
+import { cubicOut } from "svelte/easing";
+import { fade, type TransitionConfig } from "svelte/transition";
+
 export let text: string;
 export let fromPlayer: boolean;
 </script>
 
-<div class:from-player={fromPlayer}>
+<div class:from-player={fromPlayer}
+        in:fade={{duration: 500, easing: cubicOut}}>
     {text}
 </div>
 
@@ -18,6 +22,8 @@ div {
     color: var(--col-red);
 
     border-radius: 1rem;
+    font-size: 1.25rem;
+    word-break: break-word;
 
     &:not(.from-player) {
         border-bottom-left-radius: 0;

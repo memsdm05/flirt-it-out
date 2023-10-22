@@ -1,2 +1,4 @@
-class Host:
+from .common import PacketAgent
+
+class Host(PacketAgent):
     pass

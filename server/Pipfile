@@ -7,6 +7,8 @@ name = "pypi"
 quart = "*"
 uvicorn = "*"
 httpx = "*"
+aiofiles = "*"
+quart-cors = "*"
 torch = "*"
 torchvision = "*"
 torchaudio = "*"
@@ -17,6 +19,7 @@ optimum = "*"
 transformers = {ref = "72958fcd3c98a7afdc61f953aa58c544ebda2f79", git = "git+https://github.com/huggingface/transformers.git"}
 
 [dev-packages]
+black = "*"
 
 [requires]
 python_version = "3.10"

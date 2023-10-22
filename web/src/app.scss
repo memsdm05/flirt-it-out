@@ -21,8 +21,8 @@
 
 
     --input-color: #F3A56E;
-    --button-color: #ED3F198a;
-    --button-highlight-color: #ff8d4f8a;
+    --button-color: #a72d11;
+    --button-highlight-color: #f43d3d;
     --button-active-color: #7100008a;
     --button-extrusion-color: #c400008a;
 
@@ -50,6 +50,10 @@ body {
 
     font-size: 1.5rem;
     overflow: hidden;
+
+    > div {
+        overflow: hidden; // probably mobile-only fix for scrolling
+    }
 }
 
 h1 {
@@ -70,7 +74,7 @@ option {
 }
 
 [contenteditable],
-input {
+input:not([type="submit"]) {
     width: 100%;
     background: #fff;
     border-radius: 0.5rem;
@@ -95,7 +99,8 @@ input {
     text-align: center;
 }
 
-button {
+button,
+input[type="submit"] {
     // border-radius: 8px;
 
     background-color: var(--button-color);
