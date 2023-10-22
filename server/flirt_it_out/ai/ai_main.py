@@ -1,4 +1,6 @@
 import multiprocessing
+import random
+
 from ctransformers import AutoModelForCausalLM
 
 class User:
@@ -98,9 +100,20 @@ class Model:
             if len(user.messages) % 2 == 1:
                 user.remove_message()
 
-            output = self.model(user.combined_messages() + f"<|im_start|>CONVERSATION RATER\nI would give {user.name} a score out of 10 of: (").split(')', 1)
-            text = output[1].strip('\n')
-            num = int(output[0].strip(')').split('/')[0])
+            input_string = user.combined_messages() + f"<|im_start|>CONVERSATION RATER\nI would give {user.name} a score out of 10 of: ("
+
+            output = self.model(input_string).split(')', 1)
+
+            try:
+                num = float(output[0].strip(')').split('/')[0])
+                text = output[1].strip('\n').strip('.').strip()
+            except:
+                num = random.randrange(0,10)
+                text = ''
+
+            if len(text) <= 2:
+                self.model(input_string + str(num) + f')\n{user.name}')
+                print("Regenerated")
 
             yield user.user_id, num, text
 
