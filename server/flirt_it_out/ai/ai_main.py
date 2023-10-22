@@ -98,7 +98,11 @@ class Model:
             if len(user.messages) % 2 == 1:
                 user.remove_message()
 
-            yield (user.user_id, self.model(user.combined_messages() + f"<|im_start|>CONVERSATION RATER\nI would give {user.name} a score out of 10 of: ("))
+            output = self.model(user.combined_messages() + f"<|im_start|>CONVERSATION RATER\nI would give {user.name} a score out of 10 of: (").split(')', 1)
+            text = output[1].strip('\n')
+            num = int(output[0].strip(')').split('/')[0])
+
+            yield user.user_id, num, text
 
     def change_message(self, user_id, index, message):
         """Changes message of a user"""
