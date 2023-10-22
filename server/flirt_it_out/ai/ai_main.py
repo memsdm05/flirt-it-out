@@ -44,10 +44,12 @@ def run():
     total_time = time.time()
     for user in user_names:
         start_time = time.time()
-        generate = model(message_dict[user], stream=True)
+        model.tokenize(message_dict[user])
+        print(time.time() - start_time)
+        #generate = model(message_dict[user], stream=True)
         print(message_dict[user], end="", flush=True)
-        for text in generate:
-            print(text, end="", flush=True)
+        # for text in generate:
+        #     print(text, end="", flush=True)
     print(time.time() - total_time)
 
 
