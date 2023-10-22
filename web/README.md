@@ -1,3 +1,8 @@
+# Flirt it Out web client
+
+Run `npm ci` and then `npm run build` to build this project to static files, in `./build`. These files can then be served statically from the backend server in `../server/`.
+
+---
 # create-svelte
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
