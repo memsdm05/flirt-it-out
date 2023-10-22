@@ -93,7 +93,7 @@ class Model:
             user.add_message(self.ai_description)
             user.add_message(self.ai_first_message)
 
-        self.model(self.users[min(self.users.keys())].combined_messages(), max_new_tokens=0)
+        #self.model(self.users[min(self.users.keys())].combined_messages(), max_new_tokens=0)
 
     def rate_all_chats(self):
         """Rates the chats of all users"""
