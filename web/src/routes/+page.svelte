@@ -7,15 +7,17 @@ import DrumrollPage from "$/pages/DrumrollPage.svelte";
 
 import {GameState, gameState, socket} from "@/store";
 
+import {browser} from "$app/environment";
 
-onMount(() => {
+
+if (browser) {
     const socketUrl = new URL("/client", location.href);
     socketUrl.protocol = socketUrl.protocol.replace("http", "ws");
     $socket = new WebSocket(socketUrl.href);
     $socket.addEventListener("open", () => {
         console.log("socket ready");
     });
-})
+}
 </script>
 
 {#if $gameState === GameState.Lobby}
