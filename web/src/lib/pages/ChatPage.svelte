@@ -42,9 +42,12 @@ const send = async () => {
     awaitingResponse = true;
 
     hasReceivedIndicator = true;
-    setTimeout(() => hasReceivedIndicator = false, 1000);
+    const receivedTimeout = setTimeout(() => hasReceivedIndicator = false, 2000);
 
     await new Promise(resolve => setTimeout(resolve, 10000));
+
+    hasReceivedIndicator = false;
+    clearTimeout(receivedTimeout);
     
 
     messages.push({
@@ -152,7 +155,7 @@ top-bar {
     display: flex;
     align-items: center;
     justify-content: space-around;
-    margin-top: -1rem;
+    margin-top: -1.5rem;
     margin-left: -1rem;
     margin-right: -1rem;
 }
@@ -177,7 +180,7 @@ timer- {
     place-items: center;
 
     > .timer-star {
-        width: 5rem;
+        width: 6rem;
     }
 
     > img.animating {

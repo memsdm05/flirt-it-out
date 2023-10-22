@@ -6,4 +6,4 @@ export enum GameState {
     Scoring,
     Leaderboard,
 }
-export const gameState = writable<GameState>(GameState.Chat);
+export const gameState = writable<GameState>(GameState.Lobby);
