@@ -7,8 +7,11 @@ from quart import (
     abort,
     url_for,
     redirect,
+    send_from_directory,
 )
 from quart_cors import cors
+import json
+import uuid
 
 from .room import Room
 from .host import Host
@@ -17,8 +20,30 @@ from .common import config, find
 import aiofiles
 
 app = Quart(__name__)
-app = cors(app)
+# app = cors(app)
 room = None
+
+class MoneyJSONEncoder(json.JSONEncoder):
+    def default(self, object_):
+        if isinstance(object_, uuid.UUID):
+            return str(object_)
+        else:
+            return super().default(object_)
+
+class MoneyJSONDecoder(json.JSONDecoder):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(object_hook=self.dict_to_object, *args, **kwargs)
+
+    def dict_to_object(self, dict_):
+        if "id" in dict_:
+            return uuid.UUID(dict_["id"])
+        else:
+            return dict_
+
+app.json_decoder = MoneyJSONDecoder
+app.json_encoder = MoneyJSONEncoder
+
 
 @app.before_serving
 async def setup():
@@ -43,13 +68,16 @@ async def shutdown():
 async def pre_request():
     session.permanent = True
 
+@app.route("/_app/immutable/<path:path>")
+async def serve_stuff(path):
+    return await send_from_directory('../web/build/_app/immutable', path)
 
 @app.get("/")
 async def index():
     if "uid" not in session:
         return redirect("/register")
-
-    return "hello world"
+    
+    return await send_from_directory("../web/build", "index.html")
 
 
 @app.get("/status")
@@ -59,7 +87,7 @@ async def status():
 
 @app.get("/register")
 async def register_page():
-    return await render_template("register.html")
+    return await send_from_directory("../web/build/register", "index.html")
 
 
 @app.post("/register")
@@ -69,10 +97,6 @@ async def register_session():
 
     if not name:
         return abort(402)
-
-    # if find(room.users, lambda user: user.name == name):
-    #     # TODO maybe only check if user session has what it needs
-    #     return f"user {name} already exists"
 
     if session.get("name") != name:
         session.clear()

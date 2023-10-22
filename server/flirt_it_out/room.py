@@ -21,7 +21,7 @@ class Room:
         self.host = None
         
         # TODO maybe change this idk lol
-        self.lobby_queue = asyncio.Queue(maxsize=int(config["round"]["max_users"]))
+        self.lobby_queue = asyncio.Queue()
 
         # associates userids with chats
         self.chats = {}
