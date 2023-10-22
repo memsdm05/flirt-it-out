@@ -1,5 +1,5 @@
 <script lang="ts">
-import { afterUpdate, onDestroy, onMount } from "svelte";
+import { afterUpdate, onDestroy, onMount, tick } from "svelte";
 import MessageBubble from "$/MessageBubble.svelte";
 
 import timerStar from "$/images/timer-star.svg";
@@ -34,6 +34,8 @@ onDestroy(() => {
 });
 
 const send = () => {
+    if (newMessageText.length === 0) return;
+
     messages.push({
         fromPlayer: true,
         text: newMessageText.trim(),
@@ -47,16 +49,24 @@ const send = () => {
     input?.focus();
 };
 
-afterUpdate(() => {
+$: messages, (async () => {
+    await tick();
     messageContainer?.scrollTo(0, messageContainer.scrollHeight);
-});
+})();
+
+const onkeydown = (event: KeyboardEvent) => {
+    if (event.key === "Enter") {
+        send();
+        event.preventDefault();
+    }
+};
 </script>
 
 <div class="chat-page">
     <top-bar>
-        <ai-description>
+        <ai-name-tag>
             Emily
-        </ai-description>
+        </ai-name-tag>
 
         <timer- class="strong-label">
             <!-- svelte-ignore a11y-missing-attribute -->
@@ -82,7 +92,8 @@ afterUpdate(() => {
     <messenger->
         <div contenteditable
                 bind:innerText={newMessageText}
-                bind:this={input} />
+                bind:this={input}
+                on:keydown={onkeydown} />
     
         <button on:click={send}
                 disabled={newMessageText.trim().length === 0}>Send</button>
@@ -109,12 +120,13 @@ top-bar {
     margin-right: -1rem;
 }
 
-ai-description {
+ai-name-tag {
     background: linear-gradient(90deg, var(--col-red), #E94580);
     padding: 0.5rem;
     border: 0.5rem solid var(--col-yellow-light);
     width: 70%;
-    font-size: 1.25rem;
+    font-weight: 700;
+    transform: skewY(4deg) skewX(4deg);
 }
 
 timer- {

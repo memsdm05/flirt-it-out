@@ -50,6 +50,10 @@ body {
 
     font-size: 1.5rem;
     overflow: hidden;
+
+    > div {
+        overflow: hidden; // probably mobile-only fix for scrolling
+    }
 }
 
 h1 {

@@ -39,6 +39,8 @@ main {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+
+        height: calc(100vh - 16rem);
     }
 
     > .hearts-bottom {
@@ -66,6 +68,14 @@ main {
 h1 {
     text-transform: uppercase;
     z-index: 1;
-    text-shadow: 0 0 1rem var(--col-red);
+    text-shadow: 0 0 1rem var(--col-red),
+        1px 1px var(--col-yellow),
+        2px 2px var(--col-yellow),
+        3px 3px var(--col-yellow),
+        4px 4px var(--col-yellow),
+        4px 4px 1rem #861524,
+        4px 4px 0.5rem #861524;
+
+    transform: skewY(-4deg) skewX(-4deg);
 }
 </style>

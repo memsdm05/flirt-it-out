@@ -23,7 +23,8 @@ let name = "";
                 bind:value={name}
                 placeholder="your name"
                 name="name"
-                id="name-input" />
+                id="name-input"
+                maxlength="12" />
 
         <input type="submit"
                 value="Register"
@@ -36,21 +37,23 @@ div {
     display: flex;
     flex-flow: column;
     align-items: flex-start;
+    
+    gap: 1rem;
 
     > form {
         display: flex;
         flex-flow: column;
 
         gap: 1rem;
+
+        > input[type="submit"] {
+            align-self: flex-end;
+        }
     }
 
 
     > * {
         padding: 0 1.5rem;
-    }
-
-    > div {
-        align-self: flex-end;
     }
 }
 
