@@ -16,7 +16,8 @@ let name = "";
                 placeholder="your name"
                 name="name"
                 id="name-input"
-                maxlength="12" />
+                maxlength="12"
+                tabindex="0" />
 
         <input type="submit"
                 value="Register"

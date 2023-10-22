@@ -175,12 +175,13 @@ onDestroy(() => {
                 on:keydown={onkeydown}
                 on:keypress={event => charCount > CHAR_LIMIT && event.preventDefault()}
                 on:focus={onfocus}
-                class:disabled={messageSubmitted} />
+                class:disabled={messageSubmitted}
+                tabindex="0" />
     
         <div class="messenger-bottom-row">
             {charCount} / {CHAR_LIMIT}
             <button on:click={send}
-                    disabled={!messageSubmitted && newMessageText.trim().length === 0}>Send</button>
+                    disabled={messageSubmitted || newMessageText.trim().length === 0}>Send</button>
         </div>
         
     </messenger->
