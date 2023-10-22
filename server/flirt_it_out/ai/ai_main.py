@@ -43,7 +43,7 @@ class User:
 
 
 class Model:
-    def __init__(self, cd ="/home/ethan/flirt-it-out/server/flirt_it_out/ai/ai_models/mistral-7b-openorca.Q4_K_M.gguf"):
+    def __init__(self, cd ="/home/ethan/flirt-it-out/server/mistral-7b-openorca.Q4_K_M.gguf"):
         self.model = self._load_model(model_path)
 
         self.ai_name = None
@@ -118,6 +118,9 @@ class Model:
             text = user.name + self.model(input_string + str(num) + f')\n{user.name}')
 
         return num, text.rstrip()
+
+    def message_history(self, user_id):
+        return self.users[user_id].messages[1:]
 
     def change_message(self, user_id, index, message):
         """Changes message of a user"""
