@@ -1,5 +1,7 @@
 <script lang="ts">
 import { afterUpdate, onDestroy, onMount, tick } from "svelte";
+import { fly } from "svelte/transition";
+import { cubicOut } from "svelte/easing";
 import MessageBubble from "$/MessageBubble.svelte";
 
 import timerStar from "$/images/timer-star.svg";
@@ -15,41 +17,52 @@ let messages: Message[] = [];
 
 let newMessageText = "";
 
-let nSecondsRemaining = 90;
-let animationHandle = 0;
+let messageSubmitted = false;
+let awaitingResponse = false;
 
-let animating = false;
-const startTime = Date.now();
-onMount(() => {
-    const onNewFrame = (now: number) => {
-        nSecondsRemaining = Math.max(0, 90 - Math.floor((Date.now() - startTime) / 1000));
-        animationHandle = requestAnimationFrame(onNewFrame);
-    };
+let hasReceivedIndicator = false;
 
-    animationHandle = requestAnimationFrame(onNewFrame);
-    animating = true;
-});
-onDestroy(() => {
-    clearInterval(animationHandle);
-});
-
-const send = () => {
-    if (newMessageText.length === 0) return;
+const send = async () => {
+    if (newMessageText.length === 0 || awaitingResponse) return;
 
     messages.push({
         fromPlayer: true,
         text: newMessageText.trim(),
-    }, {
-        fromPlayer: false,
-        text: "Squadalaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaah",
     });
     messages = messages;
 
+    messageSubmitted = true;
     newMessageText = "";
+
+    input?.blur();
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+
+    awaitingResponse = true;
+
+    hasReceivedIndicator = true;
+    const receivedTimeout = setTimeout(() => hasReceivedIndicator = false, 2000);
+
+    await new Promise(resolve => setTimeout(resolve, 10000));
+
+    hasReceivedIndicator = false;
+    clearTimeout(receivedTimeout);
+    
+
+    messages.push({
+        fromPlayer: false,
+        text: "Squadalaaaaaaaaaaaah",
+    });
+    messages = messages;
+
+    messageSubmitted = false;
+    awaitingResponse = false;
+
     input?.focus();
 };
 
-$: messages, (async () => {
+$: messages, awaitingResponse, messageSubmitted, (async () => {
     await tick();
     messageContainer?.scrollTo(0, messageContainer.scrollHeight);
 })();
@@ -60,6 +73,24 @@ const onkeydown = (event: KeyboardEvent) => {
         event.preventDefault();
     }
 };
+
+
+let nSecondsRemaining = 0;
+let timerAnimationHandle = 0;
+let timerAnimating = false;
+const startTime = Date.now();
+onMount(() => {
+    const onNewFrame = (now: number) => {
+        nSecondsRemaining = Math.max(0, 180 - Math.floor((Date.now() - startTime) / 1000));
+        timerAnimationHandle = requestAnimationFrame(onNewFrame);
+    };
+
+    timerAnimationHandle = requestAnimationFrame(onNewFrame);
+    timerAnimating = true;
+});
+onDestroy(() => {
+    clearInterval(timerAnimationHandle);
+});
 </script>
 
 <div class="chat-page">
@@ -72,7 +103,7 @@ const onkeydown = (event: KeyboardEvent) => {
             <!-- svelte-ignore a11y-missing-attribute -->
             <img src={timerStar}
                     class="timer-star"
-                    class:animating={animating} />
+                    class:animating={timerAnimating} />
             <span>{nSecondsRemaining}</span>
         </timer->
     </top-bar>
@@ -81,9 +112,17 @@ const onkeydown = (event: KeyboardEvent) => {
         <!-- <div class="spacer"></div> -->
 
         {#if messages.length > 0}
-            {#each messages as message}
-                <MessageBubble {...message} />
+            {#each messages as message, index}
+                <MessageBubble {...message}
+                        hasSendingIndicator={index === messages.length - 1 && messageSubmitted && !awaitingResponse}
+                        hasReceivedIndicator={index === messages.length - 1 && hasReceivedIndicator} />
             {/each}
+
+            {#if awaitingResponse}
+                <MessageBubble text=""
+                        fromPlayer={false}
+                        awaiting={true} />
+            {/if}
         {:else}
             <div class="empty-message">Say something! The clock is ticking!</div>
         {/if}
@@ -93,7 +132,8 @@ const onkeydown = (event: KeyboardEvent) => {
         <div contenteditable
                 bind:innerText={newMessageText}
                 bind:this={input}
-                on:keydown={onkeydown} />
+                on:keydown={onkeydown}
+                class:disabled={messageSubmitted} />
     
         <button on:click={send}
                 disabled={newMessageText.trim().length === 0}>Send</button>
@@ -115,7 +155,7 @@ top-bar {
     display: flex;
     align-items: center;
     justify-content: space-around;
-    margin-top: -1rem;
+    margin-top: -1.5rem;
     margin-left: -1rem;
     margin-right: -1rem;
 }
@@ -140,7 +180,7 @@ timer- {
     place-items: center;
 
     > .timer-star {
-        width: 5rem;
+        width: 6rem;
     }
 
     > img.animating {
@@ -196,5 +236,10 @@ messenger- {
 
     padding-left: 0.5em;
     padding-right: 0.5em;
+
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
 }
 </style>

@@ -5,7 +5,7 @@ import heartsBottom from "$/images/hearts-bottom.svg";
 import "@/app.scss";
 </script>
 
-<main>  
+<main>
     <img src={starburst} class="starburst" alt="Starburst" />
     <img src={heartsBottom} class="hearts-bottom" alt="Starburst" />
 
