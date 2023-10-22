@@ -1,4 +1,5 @@
 from collections import namedtuple
+from dataclasses import dataclass, field
 import configparser
 from typing import Any
 import asyncio
@@ -14,25 +15,60 @@ config = configparser.ConfigParser()
 
 Message = namedtuple("Message", "id sender content")
 
-def find(predicate, lst):
-    return next(x for x in lst if predicate(x))
 
+@dataclass
 class Packet:
-    pass
+    action: str
+    payload: dict = field(default_factory=dict)
+
+    def __get__(self, thing: str) -> Any:
+        return self.payload[thing]
+
 
 class PacketAgent:
     def __init__(self) -> None:
         self.outbox = asyncio.Queue()
-        self.handlers = {}
+        self.handlers = None
+        self.connected = False
+
+        self.consumer = None
+        self.producer = None
+
+    async def _consumer(self, room):
+        while True:
+            data = await websocket.receive_json()
+            packet = Packet(action=data["action"], payload=data["payload"])
+
+            if not self.handlers:
+                continue
+
+            if packet.action not in self.handlers:
+                continue
+
+            await self.handlers[packet.action](room, **packet.payload)
+
+    async def _producer(self, room: Room):
+        try:
+            while True:
+                out = await self.outbox.get()
+                await websocket.send_json(out)
+        except:
+            room.kick(self)
+            self.disconnect()
+
+    async def start(self, room: Room):
+        await self.outbox.put(Packet("hello"))
+
+        self.consumer = asyncio.create_task(self._consumer(room))
+        self.producer = asyncio.create_task(self._producer(room))
+        self.connected = True
+        return await asyncio.gather(self.consumer, self.producer)
     
-    async def _consumer(self):
-        while True:
-            msg = await websocket.receive_json()
-            pass
+    async def disconnect(self):
+        self.consumer.cancel()
+        self.producer.cancel()
 
-    async def _producer(self):
-        while True:
-            pass
+        await self.consumer
+        await self.producer
 
-    async def start(room: Room):
-        pass
+        self.connected = False

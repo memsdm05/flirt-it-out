@@ -15,7 +15,8 @@ import uuid
 
 from .room import Room
 from .host import Host
-from .common import config, find
+from .common import config, Packet
+from .user import User
 
 import aiofiles
 
@@ -27,6 +28,12 @@ class MoneyJSONEncoder(json.JSONEncoder):
     def default(self, object_):
         if isinstance(object_, uuid.UUID):
             return str(object_)
+        elif isinstance(object_, Packet):
+            packet: Packet = object_
+            return {
+                "action": packet.action,
+                "payload": packet.payload
+            }
         else:
             return super().default(object_)
 
@@ -94,15 +101,12 @@ async def register_page():
 async def register_session():
     form = await request.form
     name = form.get("name")
-
+    
     if not name:
         return abort(402)
 
     if session.get("name") != name:
         session.clear()
-
-    if "uid" in session:
-        return redirect("/")
 
     user = await room.create_user(name)
     session["uid"] = str(user.id)
@@ -113,13 +117,23 @@ async def register_session():
 
 @app.websocket("/client")
 async def client_stream():
-    pass
+    uuid_str = session.get("uid")
+    print(session)
+    if not uuid_str:
+        print("shit")
+        abort(500)
 
+    user: User = room.find_user(uuid_str)
+    if not user:
+        abort(501)
+
+    await websocket.accept()
+    return await user.start(room)
+    
 
 @app.websocket("/host")
 async def host_stream():
     pass
-
 
 @app.websocket("/echo")
 async def test_echo():

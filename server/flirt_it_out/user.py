@@ -9,9 +9,15 @@ else:
 
 class User(PacketAgent):
     def __init__(self, name: str, room: Room) -> None:
+        super(User, self).__init__()
+
         self.id = uuid.uuid1()
         self.name = name
         self.room = room
 
-    async def handle_so_and_so():
-        pass
+        self.handlers = {
+            "msg": self.handle_msg
+        }
+
+    async def handle_msg(self, room: Room, content):
+        print(content)
