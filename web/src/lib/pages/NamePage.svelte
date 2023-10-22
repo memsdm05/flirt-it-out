@@ -1,15 +1,7 @@
 <script lang="ts">
-import { goto } from "$app/navigation";
-import {username} from "@/store";
 import heart from "$/images/heart.svg";
 
 let name = "";
-
-// const onSubmitName = async () => {
-//     if (name.length === 0) return;
-
-//     $username = name;
-// };
 </script>
 
 <div>
@@ -37,7 +29,7 @@ div {
     display: flex;
     flex-flow: column;
     align-items: flex-start;
-    
+
     gap: 1rem;
 
     > form {
