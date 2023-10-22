@@ -7,6 +7,9 @@ import MessageBubble from "$/MessageBubble.svelte";
 import timerStar from "$/images/timer-star.svg";
 import { botName, GameState, gameState, roundEnd, socket, type SocketMessage } from "@/store";
 
+
+const CHAR_LIMIT = 140;
+
 interface Message {
     fromPlayer: boolean;
     text: string;
@@ -17,6 +20,7 @@ let input: null | HTMLElement = null;
 let messages: Message[] = [];
 
 let newMessageText = "";
+$: charCount = newMessageText.trim().length;
 
 let messageSubmitted = false;
 let awaitingResponse = false;
@@ -169,11 +173,16 @@ onDestroy(() => {
                 bind:innerText={newMessageText}
                 bind:this={input}
                 on:keydown={onkeydown}
+                on:keypress={event => charCount > CHAR_LIMIT && event.preventDefault()}
                 on:focus={onfocus}
                 class:disabled={messageSubmitted} />
     
-        <button on:click={send}
-                disabled={!messageSubmitted && newMessageText.trim().length === 0}>Send</button>
+        <div class="messenger-bottom-row">
+            {charCount} / {CHAR_LIMIT}
+            <button on:click={send}
+                    disabled={!messageSubmitted && newMessageText.trim().length === 0}>Send</button>
+        </div>
+        
     </messenger->
 </div>
 
@@ -266,6 +275,13 @@ messenger- {
     display: flex;
     flex-flow: column;
     gap: 1rem;
+
+    > .messenger-bottom-row {
+        display: flex;
+        gap: 1rem;
+        justify-content: space-around;
+        align-items: center;
+    }
 }
 
 [contenteditable] {
@@ -273,6 +289,8 @@ messenger- {
 
     padding-left: 0.5em;
     padding-right: 0.5em;
+
+    text-align: left;
 
     &.disabled {
         pointer-events: none;

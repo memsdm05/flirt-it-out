@@ -6,7 +6,7 @@ export enum GameState {
     Scoring,
     Leaderboard,
 }
-export const gameState = writable<GameState>(GameState.Lobby);
+export const gameState = writable<GameState>(GameState.Chat);
 
 export const roundEnd = writable<Date>(new Date());
 export const botName = writable<string>("");
