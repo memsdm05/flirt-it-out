@@ -70,7 +70,7 @@ option {
 }
 
 [contenteditable],
-input {
+input:not([type="submit"]) {
     width: 100%;
     background: #fff;
     border-radius: 0.5rem;
@@ -95,7 +95,8 @@ input {
     text-align: center;
 }
 
-button {
+button,
+input[type="submit"] {
     // border-radius: 8px;
 
     background-color: var(--button-color);
