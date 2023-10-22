@@ -6,12 +6,13 @@ export enum GameState {
     Scoring,
     Leaderboard,
 }
-export const gameState = writable<GameState>(GameState.Chat);
+export const gameState = writable<GameState>(GameState.Lobby);
 
 
-export interface SocketMessage<Action extends "msg" | "anim_end"> {
+export interface SocketMessage<Action extends "msg" | "stasis"> {
     action: Action;
     payload: Action extends "msg" ? {content: string} :
+            Action extends "stasis" ? {display: string} :
             {};
 }
 

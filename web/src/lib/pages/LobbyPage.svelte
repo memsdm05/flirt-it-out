@@ -1,5 +1,31 @@
+<script lang="ts">
+import { onDestroy, onMount } from "svelte";
+import { socket, type SocketMessage } from "@/store";
+
+let displayedText = "The game will start shortly…";
+
+
+const handleMessage = (event: MessageEvent) => {
+    const data: SocketMessage<"stasis"> = JSON.parse(event.data);
+
+    switch (data.action) {
+        case "stasis":
+            displayedText = data.payload.display;
+            break;
+    }
+}
+
+onMount(() => {
+    $socket!.addEventListener("message", handleMessage);
+});
+
+onDestroy(() => {
+    $socket?.removeEventListener("message", handleMessage);
+})
+</script>
+
 <div>
-    <div>The game will start shortly…</div>
+    <div>{displayedText}</div>
     <div class="dot"></div>
 </div>
 

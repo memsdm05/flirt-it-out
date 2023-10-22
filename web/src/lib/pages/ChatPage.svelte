@@ -99,6 +99,12 @@ const onkeydown = (event: KeyboardEvent) => {
     }
 };
 
+const onfocus = (event: FocusEvent) => {
+    if (messageSubmitted) {
+        input?.blur();
+    }
+};
+
 
 
 let nSecondsRemaining = 0;
@@ -159,10 +165,11 @@ onDestroy(() => {
                 bind:innerText={newMessageText}
                 bind:this={input}
                 on:keydown={onkeydown}
+                on:focus={onfocus}
                 class:disabled={messageSubmitted} />
     
         <button on:click={send}
-                disabled={newMessageText.trim().length === 0}>Send</button>
+                disabled={!messageSubmitted && newMessageText.trim().length === 0}>Send</button>
     </messenger->
 </div>
 
