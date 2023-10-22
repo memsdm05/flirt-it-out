@@ -5,7 +5,7 @@ import { cubicOut } from "svelte/easing";
 import MessageBubble from "$/MessageBubble.svelte";
 
 import timerStar from "$/images/timer-star.svg";
-import { botName, GameState, gameState, roundEnd, socket, type SocketMessage, type SocketPayload } from "@/store";
+import { botName, GameState, gameState, roundEnd, socket, type SocketMessage } from "@/store";
 
 
 const CHAR_LIMIT = 140;
@@ -60,11 +60,10 @@ const send = async () => {
     const newText: string = await new Promise(resolve => {
         const handleMessage = (event: MessageEvent) => {
             const data: SocketMessage = JSON.parse(event.data);
-            const payload = JSON.parse(data.payload);
 
             switch (data.action) {
                 case "msg":
-                    resolve((payload as SocketPayload<"msg">).content);
+                    resolve((data as SocketMessage<"msg">).payload.content);
                     break;
 
                 default:
