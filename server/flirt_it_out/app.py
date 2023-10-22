@@ -61,9 +61,13 @@ async def setup():
         config.read_string(text)
     print(f"loaded config: {config.sections()}")
 
-    room = Room()
+    room = Room(
+        duration=int(config["round"]["length"])
+    )
 
     app.config["SECRET_KEY"] = config["server"]["secret_key"]
+
+    await room.start()
 
 
 @app.after_serving

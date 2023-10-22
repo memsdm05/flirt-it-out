@@ -6,14 +6,19 @@ export enum GameState {
     Scoring,
     Leaderboard,
 }
-export const gameState = writable<GameState>(GameState.Chat);
+export const gameState = writable<GameState>(GameState.Lobby);
+
+export const roundEnd = writable<Date>(new Date());
+export const botName = writable<string>("");
 
 
-export interface SocketMessage<Action extends "msg" | "anim_end"> {
+export type SocketMessageAction = "msg" | "stasis" | "start_round";
+export interface SocketMessage<Action extends SocketMessageAction=SocketMessageAction> {
     action: Action;
     payload: Action extends "msg" ? {content: string} :
+            Action extends "stasis" ? {display: string} :
+            Action extends "start_round" ? {ends_at: string, bot_name: string} :
             {};
 }
-
 
 export const socket = writable<WebSocket | null>(null);
