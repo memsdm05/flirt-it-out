@@ -61,7 +61,7 @@ class Model:
             max_new_tokens=64,
             context_length=4096,
             local_files_only=True,
-            threads=multiprocessing.cpu_count() - 2,
+            #threads=multiprocessing.cpu_count() - 2,
             stream=False,
         )
 
