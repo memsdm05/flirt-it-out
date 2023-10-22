@@ -72,7 +72,8 @@ async def setup():
 
 @app.after_serving
 async def shutdown():
-    pass
+    # await room.end()
+    raise Exception("STOP")
 
 
 @app.before_request
@@ -137,7 +138,15 @@ async def client_stream():
 
 @app.websocket("/host")
 async def host_stream():
-    pass
+    await websocket.accept()
+
+    if room.host:
+        abort(403)
+
+    host = await room.create_host()
+
+    await websocket.accept()
+    return await host.start(room)
 
 @app.websocket("/echo")
 async def test_echo():
