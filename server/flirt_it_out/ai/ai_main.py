@@ -113,7 +113,7 @@ class Model:
                 text = user.name + self.model(input_string + str(num) + f')\n{user.name}')
                 print("Regenerated")
 
-            yield user.user_id, num, text
+            yield user.user_id, num, text.rstrip()
 
     def change_message(self, user_id, index, message):
         """Changes message of a user"""
