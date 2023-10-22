@@ -84,7 +84,7 @@ class Room:
         host = Host()
         await host.send(Packet("hello"))
         self.host = host
-        # self.host_connected.set_result(True)
+        self.host_connected.set_result(True)
         return host
 
     def find_user(self, uuid_str):
