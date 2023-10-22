@@ -77,7 +77,7 @@ class Room:
 
     async def create_host(self):
         host = Host()
-        await host.send(Packet("hello"))
+        await host.send(Packet("hello", {"bot_name": "jeff", "ends_at": "thing"}))
         self.host = host
         self.host_connected.set_result(True)
         return host
