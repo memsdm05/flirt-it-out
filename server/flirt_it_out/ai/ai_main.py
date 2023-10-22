@@ -75,16 +75,12 @@ class Model:
         self.ai_description = ai_description
         self.ai_first_message = ai_first_message
 
+    def start_game(self):
         # Update ai_name for all users
         for user in self.users.values():
-            user.ai_name = ai_name
-
-            user.remove_message()
-            user.remove_message()
-
-            user.add_message(ai_description)
-            user.add_message(ai_first_message)
-
+            user.ai_name = self.ai_name
+            user.add_message(self.ai_description)
+            user.add_message(self.ai_first_message)
 
     def send_message(self, user_id: int, message: str, generate = True):
         """Sends a new message to a user given their user_id."""
@@ -114,5 +110,6 @@ def run():
     user_id = 0
     model.add_user(user_name="Ethan", user_id=user_id)
 
-    # Send a message to the user
-    print(model.send_message(user_id=user_id, message="Hey ChatGPT, how are you?"))
+    model.start_game()
+
+    model.send_message(user_id, "Hellow cutie *winks*")
