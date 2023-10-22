@@ -49,7 +49,7 @@ class Model:
             #model_file=model_file,
             #model_type="mistral",
             gpu_layers=50,
-            stop=["<|im_end|>"],
+            stop=["<|im_end|>", "<|i"],
             max_new_tokens=40,
             context_length=4096,
             local_files_only=True,
@@ -82,6 +82,17 @@ class Model:
             user.add_message(self.ai_description)
             user.add_message(self.ai_first_message)
 
+    def rate_chats(self):
+        pass
+
+    def change_message(self, user_id, index):
+        """Changes message of a user"""
+        if user_id not in self.users:
+            raise ValueError(f"User with user_id '{user_id}' does not exist.")
+
+        if len(self.users[user_id].messages) >= index:
+            raise ValueError(f"User with user_id '{user_id}' does not exist.")
+
     def send_message(self, user_id: int, message: str, generate = True):
         """Sends a new message to a user given their user_id."""
         if user_id not in self.users:
@@ -104,12 +115,12 @@ class Model:
 
 def run():
     """Runs the AI."""# Create an instance of the Model class
-    model = Model(ai_name="ChatGPT", ai_description="An AI chatbot", ai_first_message="Hello! How can I assist you today?")
+    model = Model(ai_name="Joe Biden", ai_description="You are Joe Biden, often characterized as empathetic and personable, with a long history in public service that has seen you face both personal and political challenges. You are known for your approachability and your tendency to speak candidly, sometimes leading to gaffes. Biden values personal relationships and has a reputation for reaching across the aisle in your efforts to achieve legislative compromise.", ai_first_message="Hey cutie *winks*. Wanna see something... *pulls on shirt*.")
 
     # Add a user
     user_id = 0
-    model.add_user(user_name="Ethan", user_id=user_id)
+    model.add_user(user_name="John", user_id=user_id)
 
     model.start_game()
 
-    print(model.send_message(user_id, "Hellow cutie *winks*"))
+    print(model.send_message(user_id, "Mr. President what are you doing?!"))
