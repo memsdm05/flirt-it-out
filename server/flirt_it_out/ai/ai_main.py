@@ -35,19 +35,19 @@ class User:
 
 
 class Model:
-    def __init__(self, ai_name: str, ai_description: str, ai_first_message: str):
-        self.model = self._load_model()
+    def __init__(self, ai_name: str, ai_description: str, ai_first_message: str, model_path="/home/ethan/flirt-it-out/server/flirt_it_out/ai/ai_models/mistral-7b-openorca.Q4_K_M.gguf"):
+        self.model = self._load_model(model_path)
 
         self.ai_name = ai_name
         self.ai_description = ai_description
         self.ai_first_message = ai_first_message
         self.users = {}  # Dictionary to store users by their user_id
 
-    def _load_model(self):
+    def _load_model(self, model_path):
         return AutoModelForCausalLM.from_pretrained(
-            "/home/ethan/flirt-it-out/server/flirt_it_out/ai/ai_models/mistral-7b-openorca.Q4_K_M.gguf",
+            model_path,
             #model_file=model_file,
-            model_type="mistral",
+            #model_type="mistral",
             gpu_layers=50,
             stop=["<|im_end|>"],
             max_new_tokens=40,
@@ -57,7 +57,7 @@ class Model:
             stream=False,
         )
 
-    def add_user(self, user_name: str, user_id: int) -> int:
+    def add_user(self, user_name: str, user_id: int):
         """Adds a new user with the given name and returns their user_id."""
         if user_id in self.users:
             raise ValueError(f"User with user_id '{user_id}' already exists.")
