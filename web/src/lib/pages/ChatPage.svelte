@@ -38,9 +38,12 @@ const send = async () => {
 
 
     $socket!.send(JSON.stringify({
-        content: newMessageText,
+        action: "msg",
+        payload: {
+            content: newMessageText,
+        }
     }));
-    
+
     newMessageText = "";
     
 
