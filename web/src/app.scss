@@ -61,8 +61,11 @@ main {
 
     text-align: center;
 
-    > * {
+    > :not(h1) {
         width: 100%;
+        flex-grow: 1;
+        flex-shrink: 1;
+        padding: 2rem;
     }
 }
 
@@ -148,6 +151,11 @@ button {
     font-size: 2rem;
     font-weight: 700;
     line-height: 1;
+
+    &:disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
 }
 
 button:focus,
