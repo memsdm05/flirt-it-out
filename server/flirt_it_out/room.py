@@ -60,11 +60,6 @@ class Room:
                 for user in self.users.values():
                     await user.disconnect()
 
-    async def start_game(self):
-        pass
-    
-    async def end_game(self):
-        pass
 
     async def end(self):
         self.game_loop.cancel()
