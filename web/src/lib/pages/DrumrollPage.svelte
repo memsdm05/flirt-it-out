@@ -1,9 +1,17 @@
+<script lang="ts">
+import { fade } from "svelte/transition";
+import { GameState, gameState } from "@/store";
+</script>
+
 <div class="drumroll-page">
     <div class="strong-label">
         Rizz master?!?!
     </div>
 
-    <div class="circle"></div>
+    {#if $gameState !== GameState.Leaderboard}
+        <div class="circle"
+                out:fade></div>
+    {/if}
 </div>
 
 <style lang="scss">
