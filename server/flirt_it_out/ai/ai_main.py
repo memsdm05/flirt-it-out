@@ -112,4 +112,4 @@ def run():
 
     model.start_game()
 
-    model.send_message(user_id, "Hellow cutie *winks*")
+    print(model.send_message(user_id, "Hellow cutie *winks*"))
