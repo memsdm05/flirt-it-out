@@ -1,2 +1,5 @@
 class Bot:
-    pass
+    def __init__(self):
+        self.personalities = {}
+
+    
