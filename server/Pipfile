@@ -7,6 +7,9 @@ name = "pypi"
 quart = "*"
 uvicorn = "*"
 httpx = "*"
+torch = "*"
+torchvision = "*"
+torchaudio = "*"
 
 [dev-packages]
 

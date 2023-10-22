@@ -3,8 +3,9 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 def run():
     device = "cuda"  # the device to load the model onto
 
-    model = AutoModelForCausalLM.from_pretrained("mistralai/Mistral-7B-v0.1")
-    tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-v0.1")
+    model = AutoModelForCausalLM.from_pretrained("mistralai/Mistral-7B-v0.1", load_in_4bot=True).to(device).to_bettertransformer()
+
+    tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-v0.1").to(device)
 
     prompt = "My favourite condiment is"
 
