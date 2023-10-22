@@ -17,6 +17,12 @@ class User:
         else:
             self.messages.pop(index)
 
+    def change_message(self, index, message):
+        if len(self.messages) <= index:
+            raise ValueError(f"Index '{index}' is out of range.")
+
+        self.messages[index] = message
+
     def combined_messages(self):
         if not self.messages:
             return ""
@@ -35,12 +41,12 @@ class User:
 
 
 class Model:
-    def __init__(self, ai_name: str, ai_description: str, ai_first_message: str, model_path="/home/ethan/flirt-it-out/server/flirt_it_out/ai/ai_models/mistral-7b-openorca.Q4_K_M.gguf"):
+    def __init__(self, model_path="/home/ethan/flirt-it-out/server/flirt_it_out/ai/ai_models/mistral-7b-openorca.Q4_K_M.gguf"):
         self.model = self._load_model(model_path)
 
-        self.ai_name = ai_name
-        self.ai_description = ai_description
-        self.ai_first_message = ai_first_message
+        self.ai_name = None
+        self.ai_description = None
+        self.ai_first_message = None
         self.users = {}  # Dictionary to store users by their user_id
 
     def _load_model(self, model_path):
@@ -50,7 +56,7 @@ class Model:
             #model_type="mistral",
             gpu_layers=50,
             stop=["<|im_end|>", "<|i"],
-            max_new_tokens=40,
+            max_new_tokens=64,
             context_length=4096,
             local_files_only=True,
             threads=multiprocessing.cpu_count() - 2,
@@ -69,13 +75,16 @@ class Model:
             raise ValueError(f"User with user_id '{user_id}' does not exist.")
         del self.users[user_id]
 
-    def update_ai_info(self, ai_name: str, ai_description: str, ai_first_message: str):
-        """Updates AI name, description, and first message."""
-        self.ai_name = ai_name
-        self.ai_description = ai_description
-        self.ai_first_message = ai_first_message
+    def start_game(self, ai_name=None, ai_description=None, ai_first_message=None):
+        if ai_name is not None:
+            self.ai_name = ai_name
 
-    def start_game(self):
+        if ai_description is not None:
+            self.ai_description = ai_description
+
+        if ai_first_message is not None:
+            self.ai_first_message = ai_first_message
+
         # Update ai_name for all users
         for user in self.users.values():
             user.ai_name = self.ai_name
@@ -83,17 +92,22 @@ class Model:
             user.add_message(self.ai_first_message)
 
     def rate_chats(self):
-        pass
+        """Rates the chats of all users"""
+        for user in self.users.values():
+            user.change_message(0, f"Rate this message stream based on how well {user.name} did trying to impress {user.ai_name}. Be very strict in your ratings. Give a score out of 10. Give a very brief one sentence explanation after giving your rating.")
+            if len(user.messages) % 2 == 1:
+                user.remove_message()
 
-    def change_message(self, user_id, index):
+            yield (user.user_id, self.model(user.combined_messages() + f"<|im_start|>CONVERSATION RATER\nI would give {user.name} a score out of 10 of: ("))
+
+    def change_message(self, user_id, index, message):
         """Changes message of a user"""
         if user_id not in self.users:
             raise ValueError(f"User with user_id '{user_id}' does not exist.")
 
-        if len(self.users[user_id].messages) >= index:
-            raise ValueError(f"User with user_id '{user_id}' does not exist.")
+        self.users[user_id].change_message(index, message)
 
-    def send_message(self, user_id: int, message: str, generate = True):
+    def send_message(self, user_id: int, message: str, generate=True):
         """Sends a new message to a user given their user_id."""
         if user_id not in self.users:
             raise ValueError(f"User with user_id '{user_id}' does not exist.")
@@ -114,13 +128,21 @@ class Model:
 
 
 def run():
-    """Runs the AI."""# Create an instance of the Model class
-    model = Model(ai_name="Joe Biden", ai_description="You are Joe Biden, often characterized as empathetic and personable, with a long history in public service that has seen you face both personal and political challenges. You are known for your approachability and your tendency to speak candidly, sometimes leading to gaffes. Biden values personal relationships and has a reputation for reaching across the aisle in your efforts to achieve legislative compromise.", ai_first_message="Hey cutie *winks*. Wanna see something... *pulls on shirt*.")
+    # Create an instance of the Model class
+    model = Model()
 
     # Add a user
-    user_id = 0
-    model.add_user(user_name="John", user_id=user_id)
+    users = ["John", "Will", "Henry"]
 
-    model.start_game()
+    id = 0
+    for user in users:
+        model.add_user(user_name=user, user_id=id)
+        id += 1
 
-    print(model.send_message(user_id, "Mr. President what are you doing?!"))
+    model.start_game(ai_name="Joe Biden", ai_description="You are Joe Biden, often characterized as empathetic and personable, with a long history in public service that has seen you face both personal and political challenges. You are known for your approachability and your tendency to speak candidly, sometimes leading to gaffes. Biden values personal relationships and has a reputation for reaching across the aisle in your efforts to achieve legislative compromise.", ai_first_message="Hey cutie *winks*. Wanna see something... *pulls on shirt*.")
+
+    for user_id in range(len(users)):
+        print(model.send_message(user_id, "Hello Mr. President."))
+
+    for rating in model.rate_chats():
+        print(rating)
