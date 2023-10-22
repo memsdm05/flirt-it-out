@@ -1,6 +1,7 @@
 <script lang="ts">
 import { goto } from "$app/navigation";
 import {username} from "@/store";
+import heart from "$/images/heart.svg";
 
 let name = "";
 
@@ -13,6 +14,8 @@ const onSubmitName = () => {
 </script>
 
 <div>
+    <img src={heart} alt="Heart" />
+
     <label class="strong-label"
             for="name-input">My name is</label>
     

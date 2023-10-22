@@ -9,13 +9,9 @@ interface Message {
     text: string;
 }
 let messageContainer: null | HTMLUnknownElement = null;
+let input: null | HTMLElement = null;
 
-let messages: Message[] = [
-    {fromPlayer: true, text: "hello"},
-    {fromPlayer: false, text: "hello"},
-    {fromPlayer: true, text: "hello"},
-    {fromPlayer: false, text: "hello"},
-];
+let messages: Message[] = [];
 
 let newMessageText = "";
 
@@ -43,11 +39,12 @@ const send = () => {
         text: newMessageText.trim(),
     }, {
         fromPlayer: false,
-        text: "wonderful",
+        text: "Squadalaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaah",
     });
     messages = messages;
 
     newMessageText = "";
+    input?.focus();
 };
 
 afterUpdate(() => {
@@ -57,25 +54,35 @@ afterUpdate(() => {
 
 <div class="chat-page">
     <top-bar>
-        <img src="https://placehold.co/100x100" alt="Prompt" />
-        
+        <ai-description>
+            Emily
+        </ai-description>
+
         <timer- class="strong-label">
             <!-- svelte-ignore a11y-missing-attribute -->
             <img src={timerStar}
+                    class="timer-star"
                     class:animating={animating} />
             <span>{nSecondsRemaining}</span>
         </timer->
     </top-bar>
     
     <message-container bind:this={messageContainer}>
-        {#each messages as message}
-            <MessageBubble {...message} />
-        {/each}
+        <!-- <div class="spacer"></div> -->
+
+        {#if messages.length > 0}
+            {#each messages as message}
+                <MessageBubble {...message} />
+            {/each}
+        {:else}
+            <div class="empty-message">Say something! The clock is ticking!</div>
+        {/if}
     </message-container>
 
     <messenger->
         <div contenteditable
-                bind:innerText={newMessageText} />
+                bind:innerText={newMessageText}
+                bind:this={input} />
     
         <button on:click={send}
                 disabled={newMessageText.trim().length === 0}>Send</button>
@@ -90,20 +97,28 @@ afterUpdate(() => {
     align-items: stretch;
     gap: 1rem;
     height: 100%;
+    padding-bottom: 2rem;
 }
 
 top-bar {
     display: flex;
     align-items: center;
     justify-content: space-around;
+    margin-top: -1rem;
+    margin-left: -1rem;
+    margin-right: -1rem;
+}
 
-    > img {
-        border: 0.75rem solid var(--col-yellow-light);
-    }
+ai-description {
+    background: linear-gradient(90deg, var(--col-red), #E94580);
+    padding: 0.5rem;
+    border: 0.5rem solid var(--col-yellow-light);
+    width: 70%;
+    font-size: 1.25rem;
 }
 
 timer- {
-    font-size: 3rem;
+    font-size: 2rem;
 
     border-radius: 50%;
     aspect-ratio: 1;
@@ -112,16 +127,20 @@ timer- {
     display: grid;
     place-items: center;
 
+    > .timer-star {
+        width: 5rem;
+    }
+
     > img.animating {
         animation: rotate 1s infinite cubic-bezier(.14,.54,.22,1.06);
 
         @keyframes rotate {
             0% {
-                transform: rotate(0turn);
+                transform: rotate(10deg);
             }
 
             100% {
-                transform: rotate(120deg);
+                transform: rotate(130deg);
             }
         }
     }
@@ -142,8 +161,16 @@ message-container {
     overflow-y: auto;
     flex-grow: 1;
     flex-shrink: 1;
+    // justify-content: flex-end;
+
+    padding-top: 3rem;
+    mask-image: linear-gradient(0deg, #000 90%, #0000);
 
     scroll-behavior: smooth;
+
+    > .empty-message {
+        opacity: 0.5;
+    }
 }
 
 messenger- {
