@@ -93,27 +93,31 @@ class Model:
             user.add_message(self.ai_description)
             user.add_message(self.ai_first_message)
 
-    def rate_chats(self):
+    def rate_all_chats(self):
         """Rates the chats of all users"""
         for user in self.users.values():
-            user.change_message(0, f"Rate this message stream based on how well {user.name} did trying to impress {user.ai_name}. Be very strict in your ratings. Give a score out of 10. Give a very brief one sentence explanation after giving your rating.")
+            num, text = self.rate_chat(user.user_id)
+            yield user.user_id, num, text
 
-            input_string = user.combined_messages() + f"<|im_start|>CONVERSATION RATER\nI would give {user.name} a score out of 10 of: ("
+    def rate_chat(self, user_id):
+        user = self.users[user_id]
+        user.change_message(0, f"Rate this message stream based on how well {user.name} did trying to impress {user.ai_name}. Be very strict in your ratings. Give a score out of 10. Give a very brief one sentence explanation after giving your rating.")
 
-            output = self.model(input_string).split(')', 1)
+        input_string = user.combined_messages() + f"<|im_start|>CONVERSATION RATER\nI would give {user.name} a score out of 10 of: ("
 
-            try:
-                num = float(output[0].strip(')').split('/')[0])
-                text = output[1].strip('\n').strip('.').strip()
-            except:
-                num = random.randrange(0,10)
-                text = ''
+        output = self.model(input_string).split(')', 1)
 
-            if len(text) <= 2:
-                text = user.name + self.model(input_string + str(num) + f')\n{user.name}')
-                print("Regenerated")
+        try:
+            num = float(output[0].strip(')').split('/')[0])
+            text = output[1].strip('\n').strip('.').strip()
+        except:
+            num = random.randrange(0, 10)
+            text = ''
 
-            yield user.user_id, num, text.rstrip()
+        if len(text) <= 2:
+            text = user.name + self.model(input_string + str(num) + f')\n{user.name}')
+
+        return num, text.rstrip()
 
     def change_message(self, user_id, index, message):
         """Changes message of a user"""
@@ -147,7 +151,7 @@ def run():
     model = Model()
 
     # Add a user
-    users = ["John", "Will", "Henry", "Jenny", "Audrey"]
+    users = ["John", "Will", "Henry"]
 
     id = 0
     for user in users:
@@ -160,5 +164,5 @@ def run():
         print(model.send_message(user_id, "Hello Mr. President."))
         print(model.send_message(user_id, "I want to kiss you on your beautiful lips *licks lips*"))
 
-    for rating in model.rate_chats():
+    for rating in model.rate_all_chats():
         print(rating)
