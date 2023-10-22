@@ -1,17 +1,26 @@
 <script lang="ts">
 import { onDestroy, onMount } from "svelte";
-import { socket, type SocketMessage } from "@/store";
+import { botName, roundEnd, GameState, gameState, socket, type SocketMessage, type SocketMessageAction } from "@/store";
 
 let displayedText = "The game will start shortly…";
 
 
 const handleMessage = (event: MessageEvent) => {
-    const data: SocketMessage<"stasis"> = JSON.parse(event.data);
+    const data: SocketMessage = JSON.parse(event.data);
 
     switch (data.action) {
         case "stasis":
-            displayedText = data.payload.display;
+            displayedText = (data as SocketMessage<"stasis">).payload.display;
             break;
+
+        case "start_round": {
+            const payload = (data as SocketMessage<"start_round">).payload;
+            $botName = payload.bot_name;
+            $roundEnd = new Date(payload.ends_at);
+
+            $gameState = GameState.Chat;
+            break;
+        }
     }
 }
 

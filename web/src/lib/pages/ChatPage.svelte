@@ -5,7 +5,7 @@ import { cubicOut } from "svelte/easing";
 import MessageBubble from "$/MessageBubble.svelte";
 
 import timerStar from "$/images/timer-star.svg";
-    import { socket, type SocketMessage } from "@/store";
+import { botName, roundEnd, socket, type SocketMessage } from "@/store";
 
 interface Message {
     fromPlayer: boolean;
@@ -110,10 +110,9 @@ const onfocus = (event: FocusEvent) => {
 let nSecondsRemaining = 0;
 let timerAnimationHandle = 0;
 let timerAnimating = false;
-const startTime = Date.now();
 onMount(() => {
     const onNewFrame = (now: number) => {
-        nSecondsRemaining = Math.max(0, 180 - Math.floor((Date.now() - startTime) / 1000));
+        nSecondsRemaining = Math.max(0, Math.floor(($roundEnd.getTime() - Date.now()) / 1000));
         timerAnimationHandle = requestAnimationFrame(onNewFrame);
     };
 
@@ -128,7 +127,7 @@ onDestroy(() => {
 <div class="chat-page">
     <top-bar>
         <ai-name-tag>
-            Emily
+            {$botName}
         </ai-name-tag>
 
         <timer- class="strong-label">
