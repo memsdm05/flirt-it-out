@@ -119,6 +119,9 @@ class Model:
 
         return num, text.rstrip()
 
+    def message_history(self, user_id):
+        return self.users[user_id].messages[1:]
+
     def change_message(self, user_id, index, message):
         """Changes message of a user"""
         if user_id not in self.users:
