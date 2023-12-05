@@ -5,7 +5,7 @@ The ultimate Jackbox-style game where you compete to rizz up an AI the most! Try
 
 
 ## Components
-* `/server`: Backend server and game handling mechanics (Python)
+* `/server`: Backend server and game handling mechanics (Go)
 * `/tools`: Utility scripts for building and combining the components
 * `/web`: Frontend web client where players chat with the AI (Svelte, SvelteKit, TypeScript)
 * `/unity`: Frontend Unity host client that controls the rounds and the game (Unity2D, C#)
