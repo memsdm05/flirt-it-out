@@ -7,13 +7,13 @@ import (
 	"github.com/memsdm05/flirt-it-out/game"
 )
 
-// GET /room
+// GET /rooms
 func createRoom(ctx *gin.Context) {
 	room := game.NewRoom()
 	ctx.JSON(200, room)
 }
 
-// GET /room/:code
+// GET /rooms/:code
 func getRoom(ctx *gin.Context) {
 	code := ctx.Param("code")
 	room, ok := game.Rooms[code]
@@ -26,7 +26,7 @@ func getRoom(ctx *gin.Context) {
 	}
 }
 
-// DELETE /room/:code
+// DELETE /rooms/:code
 func closeRoom(ctx *gin.Context) {
 	code := ctx.Param("code")
 	// TODO make sure to shutdown server
@@ -38,10 +38,13 @@ func InitRoutes() *gin.Engine {
 
 	api := router.Group("/api")
 	{
-		api.GET("/room", createRoom)
-		api.GET("/room/:code", getRoom)
-		api.DELETE("/room/:code", closeRoom)
+		api.GET("/rooms", createRoom)
+		api.GET("/rooms/:code", getRoom)
+		api.DELETE("/rooms/:code", closeRoom)
 	}
+
+	initHostRoutes(api)
+	initClientRoutes(api)
 
 	return router
 }

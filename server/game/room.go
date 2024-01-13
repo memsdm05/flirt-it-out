@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"math/rand"
 	"strings"
+	"sync"
 
 	"github.com/memsdm05/flirt-it-out/models"
 
@@ -17,23 +18,24 @@ const (
 var Rooms = make(map[string]*Room)
 
 type chat struct {
-	player  *models.Player
-	bot     *models.Bot
+	player  *Player
+	bot     *Bot
 	history []models.Message
 }
 
 type Room struct {
 	Code string
 
+	sync.Mutex
 	state   State
-	players map[uuid.UUID]*models.Player
-	host    *models.Host
-	bot     *models.Bot
+	players map[uuid.UUID]*Player
+	host    *Host
+	bot     *Bot
 }
 
 func NewRoom() *Room {
 	room := &Room{
-		players: make(map[uuid.UUID]*models.Player),
+		players: make(map[uuid.UUID]*Player),
 		state:   new(LobbyState),
 	}
 
@@ -56,13 +58,33 @@ func NewRoom() *Room {
 	return room
 }
 
-func (r *Room) NewPlayer(name string) *models.Player {
-	player := &models.Player{
-		Id:   uuid.Must(uuid.NewRandom()),
+func (r *Room) NewPlayer(name string) *Player {
+	r.Lock()
+	defer r.Unlock()
+
+	player := &Player{
 		Name: name,
 	}
+	player.Id = uuid.Must(uuid.NewRandom())
+
 	r.players[player.Id] = player
 	return player
+}
+
+func (r *Room) NewHost() *Host {
+	r.Lock()
+	defer r.Unlock()
+
+	if r.host != nil {
+		return nil
+	}
+	// TODO implement more rebust host check
+
+	host := &Host{}
+	host.Id = uuid.Nil
+
+	r.host = host
+	return host
 }
 
 func (r *Room) MarshalJSON() ([]byte, error) {

@@ -2,29 +2,28 @@ package packets
 
 import "encoding/json"
 
-type Agent int
+type AgentType int
 
 const (
-	None = Agent(iota)
+	None = AgentType(iota)
 	Client
 	Host
 )
 
 type Packet interface {
 	Action() string
-	Producer() Agent
-	Consumer() Agent
+	Producer() AgentType
+	Consumer() AgentType
 }
 
 func Marshal(packet Packet) ([]byte, error) {
 	raw := struct {
 		Action  string `json:"action"`
-		Payload Packet `json:"packet"`
+		Payload any    `json:"payload"`
 	}{
 		Action:  packet.Action(),
 		Payload: packet,
 	}
-
 	return json.Marshal(raw)
 }
 
@@ -53,14 +52,14 @@ type Message struct {
 	Content string `json:"content"`
 }
 
-func (Message) Action() string  { return "msg" }
-func (Message) Producer() Agent { return Client }
-func (Message) Consumer() Agent { return Client }
+func (Message) Action() string      { return "msg" }
+func (Message) Producer() AgentType { return Client }
+func (Message) Consumer() AgentType { return Client }
 
 type Kick struct {
 	Reason string `json:"reason"`
 }
 
-func (Kick) Action() string  { return "kick" }
-func (Kick) Producer() Agent { return None }
-func (Kick) Consumer() Agent { return Client | Host }
+func (Kick) Action() string      { return "kick" }
+func (Kick) Producer() AgentType { return None }
+func (Kick) Consumer() AgentType { return Client | Host }

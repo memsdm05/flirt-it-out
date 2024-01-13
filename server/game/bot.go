@@ -1,4 +1,4 @@
-package models
+package game
 
 type Bot struct {
 }
